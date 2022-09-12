@@ -1,0 +1,28 @@
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/input.css') }}">
+</head>
+<body>
+<div id="background-div">
+    <form action="{{ url_for('render_results_page') }}" method="post">
+        <div id="form-container">
+            <div id="form-left">
+                <label id="top-label-left">To</label>
+                <input type="text" name="to">
+                 <label>From</label>
+                <input type="text" name="from">
+                <label>Cc</label>
+                <input type="text" name="cc">
+                <label>Subject</label>
+                <input type="text" name="subject">
+            </div>
+            <div id="form-right">
+                <label id="top-label-right">Body</label>
+                <textarea name="body" rows="16"></textarea>
+                <button type="submit">Results</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

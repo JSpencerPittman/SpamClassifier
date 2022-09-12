@@ -1,0 +1,17 @@
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+</head>
+<body>
+  <div>
+      {% if pred[0] %}
+      <h1>Spam</h1>
+      {% else %}
+      <h1>Not Spam</h1>
+      {% endif %}
+      <p>Certainty: {{ pred[1] }}%</p>
+     <a href="{{ url_for('render_start_page') }}"><button>Back</button>
+ </a>
+  </div>
+</body>
+</html>
