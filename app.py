@@ -1,10 +1,8 @@
 from flask import Flask, request, render_template
 from model.ModelPrediction import predict
 from model.EmailFormat import SimplifiedEmail
-from model.BuildModel import buildModel
 
 app = Flask(__name__)
-buildModel("spamClassifier.pkl")
 
 @app.route('/start')
 def render_start_page():
