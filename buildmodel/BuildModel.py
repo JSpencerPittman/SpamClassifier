@@ -1,7 +1,7 @@
 from BuildModel.DataDownload import download_corpus
 from model.EmailFormat import getEmailsAndLabels
 from sklearn.model_selection import StratifiedShuffleSplit
-from model.ClassifierModel import ClassifierModel
+from model.SpamClassifierModel import ClassifierModel
 
 DATASETS_DIR = "datasets"
 
