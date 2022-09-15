@@ -1,4 +1,4 @@
-from model.DataDownload import download_corpus
+from BuildModel.DataDownload import download_corpus
 from model.EmailFormat import getEmailsAndLabels
 from sklearn.model_selection import StratifiedShuffleSplit
 from model.ClassifierModel import ClassifierModel
