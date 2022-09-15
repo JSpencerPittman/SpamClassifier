@@ -4,7 +4,7 @@ from model.EmailFormat import SimplifiedEmail
 
 app = Flask(__name__)
 
-@app.route('/start')
+@app.route('/')
 def render_start_page():
     return render_template('start.html')
 
