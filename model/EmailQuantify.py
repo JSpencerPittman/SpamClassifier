@@ -1,63 +1,73 @@
 from re import findall, sub
 
+
 class WordParser():
+    """
+    A Library that provides utility functions to
+    analyze strings
+    """
+
     def __init__(self, s):
         self.s = s
 
     # Returns the top k recurring words in the given
     # string
     def modeWords(self, k=10):
-        sortedKeys = []
-        sortedCounts = []
-        wordCounts = self.wordCounts()
+        """
+        Returns the top k recurring words in the given string
+        """
 
-        for word in wordCounts:
+        sorted_keys = []
+        sorted_counts = []
+        word_counts = self.word_counts()
+
+        for word in word_counts:
             # check if there's space to add it
-            if len(sortedCounts) < k:
-                sortedKeys.append(word)
-                sortedCounts.append(wordCounts[word])
+            if len(sorted_counts) < k:
+                sorted_keys.append(word)
+                sorted_counts.append(word_counts[word])
             # check if the last element can sort it
-            elif sortedCounts[k - 1] < wordCounts[word]:
-                sortedKeys[k - 1] = word
-                sortedCounts[k - 1] = wordCounts[word]
+            elif sorted_counts[k - 1] < word_counts[word]:
+                sorted_keys[k - 1] = word
+                sorted_counts[k - 1] = word_counts[word]
             else:
                 continue
 
-            curr_index = len(sortedCounts) - 1
-            while (curr_index > 0 and sortedCounts[curr_index] > sortedCounts[curr_index - 1]):
-                tempCount = sortedCounts[curr_index - 1]
-                tempKey = sortedKeys[curr_index - 1]
-                sortedCounts[curr_index - 1] = sortedCounts[curr_index]
-                sortedKeys[curr_index - 1] = sortedKeys[curr_index]
-                sortedCounts[curr_index] = tempCount
-                sortedKeys[curr_index] = tempKey
+            curr_index = len(sorted_counts) - 1
+            while curr_index > 0 and sorted_counts[curr_index] > sorted_counts[curr_index - 1]:
+                temp_count = sorted_counts[curr_index - 1]
+                temp_key = sorted_keys[curr_index - 1]
+                sorted_counts[curr_index - 1] = sorted_counts[curr_index]
+                sorted_keys[curr_index - 1] = sorted_keys[curr_index]
+                sorted_counts[curr_index] = temp_count
+                sorted_keys[curr_index] = temp_key
                 curr_index -= 1
 
-        modeWords = []
-        for wordCount in zip(sortedKeys, sortedCounts):
-            modeWords.append(wordCount)
-        return modeWords
+        mode_words = []
+        for wordCount in zip(sorted_keys, sorted_counts):
+            mode_words.append(wordCount)
+        return mode_words
 
-    def wordCounts(self):
-        wordCounts = {}
+    def word_counts(self):
+        word_counts = {}
         for word in self.words():
-            if word in wordCounts:
-                wordCounts[word] += 1
+            if word in word_counts:
+                word_counts[word] += 1
             else:
-                wordCounts[word] = 1
-        return wordCounts
+                word_counts[word] = 1
+        return word_counts
 
     # This takes a messy string and returns an array of every word in
     # it
     def words(self):
         # replace all whitespace with a single space
         # ''\n\n\n' -> ' '
-        parsedString = sub('\s+', ' ', self.s)
+        parsed_string = sub('\s+', ' ', self.s)
         # remove any symbol that isn't an alphabetical character
         # or space
-        parsedString = sub('[^A-Za-z ]+', '', parsedString)
+        parsed_string = sub('[^A-Za-z ]+', '', parsed_string)
         # convert the string into a list of words
-        words = parsedString.split(' ')
+        words = parsed_string.split(' ')
 
         # There are many empty entries that often get
         # counted so this removes them from words
@@ -73,24 +83,24 @@ class WordParser():
         # A common problem is words get merged after
         # removing special characters
         # Partial Solution:
-        # This seperates out words that are conjoined AND
+        # This separates out words that are conjoined AND
         # The first letter of the second word is capitalized
         # So 'helloThere' -> 'hello There' while 'HELLO' wouldn't
         # be affected
         for i in range(len(words)):
-            unconjoinedWords = self._splitConjoinedWords(words[i])
+            unconjoined_words = self._split_conjoined_words(words[i])
             # even if the word wasn't a conjoined one it still
             # returns an array of length one containing the original
             # word
-            words[i] = unconjoinedWords[0]
+            words[i] = unconjoined_words[0]
             # add the rest of the unconjoined words
-            if len(unconjoinedWords) > 1:
-                for i in range(1, len(unconjoinedWords)):
-                    words.append(unconjoinedWords[i])
+            if len(unconjoined_words) > 1:
+                for i in range(1, len(unconjoined_words)):
+                    words.append(unconjoined_words[i])
 
         # clean each word
         for i in range(len(words)):
-            words[i] = self._cleanWord(words[i])
+            words[i] = self._clean_word(words[i])
 
         # we do this the second time because after running
         # _splitConjoinedWords and _cleanWord more empty
@@ -102,7 +112,8 @@ class WordParser():
 
     # removes plurals that end with s
     # and lowercases it
-    def _cleanWord(self, word):
+    @staticmethod
+    def _clean_word(word):
         word = sub('[s$]', '', word)
         word = word.lower()
         return word
@@ -112,9 +123,10 @@ class WordParser():
     # in a list like ['apple','Honey'] however if no
     # conjoined words are detected it merely returns the
     # original word in an array 'apple' -> ['apple']
-    def _splitConjoinedWords(self, s):
-        regexExpression = '[a-z][A-Z][a-z]'
-        matches = findall(regexExpression, s)
+    @staticmethod
+    def _split_conjoined_words(s):
+        regex_expression = '[a-z][A-Z][a-z]'
+        matches = findall(regex_expression, s)
         # if no conjoined words detected return list with
         # original word
         if len(matches) == 0:
@@ -123,204 +135,201 @@ class WordParser():
         # and then split it into an list and return the
         # list
         for match in matches:
-            unconjoinedString = match[0] + ' ' + match[1:]
-            s = s.replace(match, unconjoinedString)
+            unconjoined_string = match[0] + ' ' + match[1:]
+            s = s.replace(match, unconjoined_string)
         return s.split(' ')
 
-    def wordFrequencies(self):
-        frequencies = self.wordCounts()
-        totalWords = len(frequencies)
+    def word_frequencies(self):
+        frequencies = self.word_counts()
+        total_words = len(frequencies)
         for key in frequencies:
-            frequencies[key] = 100 * (frequencies[key] / totalWords)
+            frequencies[key] = 100 * (frequencies[key] / total_words)
         return frequencies
 
-    def uniqueWords(self):
+    def unique_words(self):
         u_words = list(set(self.words()))
         return u_words
 
 
 class EmailWordCounter:
     def __init__(self, X, y):
+        self.ham_word_count = None
+        self.spam_word_count = None
         self.X = X
         self.y = y
-        self.spamWordCounts = [('a', 0), ('b', 0)]
-        self.hamWordCounts = [('a', 0), ('b', 0)]
-        self.keySpamWordsList = []
-        self.keySpamWordsDict = {}
+        self.spam_word_counts = [('a', 0), ('b', 0)]
+        self.ham_word_counts = [('a', 0), ('b', 0)]
+        self.key_spam_words_list = []
+        self.key_spam_words_dict = {}
 
     # This function records the repetitions of words in spam emails
     # as well as ham emails
     # returns spam emails, ham emails
     # wordCounts will be stored in a list of tuples [('word', count),...]
-    def countWordOccurences(self):
+    def count_word_occurences(self):
         for emailIndex in range(1, len(self.X)):
             payload = self.X[emailIndex].unifyPayload()
             wa = WordParser(payload)
-            words = wa.uniqueWords()
-            if (self.y[emailIndex] == 1):
-                self.spamWordCount = self.updateWordCount(words, True)
+            words = wa.unique_words()
+            if self.y[emailIndex] == 1:
+                self.spam_word_count = self.update_word_count(words, True)
             else:
-                self.hamWordCount = self.updateWordCount(words, False)
+                self.ham_word_count = self.update_word_count(words, False)
 
-    def updateWordCount(self, words, isSpam):
-        wordCounts = self.spamWordCounts if isSpam else self.hamWordCounts
+    def update_word_count(self, words, isSpam):
+        word_counts = self.spam_word_counts if isSpam else self.ham_word_counts
         for word in words:
 
-            locIndex = self.searchWordCounts(word, isSpam)
-            if (locIndex >= 0):
-                wordCounts[locIndex] = (word, wordCounts[locIndex][1] + 1)
+            loc_index = self.search_word_counts(word, isSpam)
+            if loc_index >= 0:
+                word_counts[loc_index] = (word, word_counts[loc_index][1] + 1)
             else:
-                wordCounts.insert((-locIndex), (word, 1))
-        return wordCounts
+                word_counts.insert((-loc_index), (word, 1))
+        return word_counts
 
-    def searchWordCounts(self, word, isSpam):
-        wordCounts = self.spamWordCounts if isSpam else self.hamWordCounts
+    def search_word_counts(self, word, isSpam):
+        word_counts = self.spam_word_counts if isSpam else self.ham_word_counts
 
-        upper = len(wordCounts) - 1
+        upper = len(word_counts) - 1
         lower = 0
         while lower < upper:
-            searchIndex = int((upper + lower) / 2)
-            if wordCounts[searchIndex][0] == word:
-                return searchIndex
-            elif wordCounts[searchIndex][0] > word:
-                upper = searchIndex
+            search_index = int((upper + lower) / 2)
+            if word_counts[search_index][0] == word:
+                return search_index
+            elif word_counts[search_index][0] > word:
+                upper = search_index
             else:
-                lower = searchIndex + 1
-        while wordCounts[searchIndex][0] > word:
-            searchIndex -= 1
-        return -(searchIndex + 1)
+                lower = search_index + 1
+        while word_counts[search_index][0] > word:
+            search_index -= 1
+        return -(search_index + 1)
 
-    def getWordOccurence(self, word, isSpam):
-        occurence = -1
-        locIndex = self.searchWordCounts(word, isSpam)
-        if (locIndex >= 0):
-            return self.spamWordCounts[locIndex][1] if isSpam else self.hamWordCounts[locIndex][1]
+    def get_word_occurence(self, word, is_spam):
+        loc_index = self.search_word_counts(word, is_spam)
+        if loc_index >= 0:
+            return self.spam_word_counts[loc_index][1] if is_spam else self.ham_word_counts[loc_index][1]
         else:
             return -1
 
-    def trimWordCounts(self):
-        removalIndices = []
-        for i in range(len(self.hamWordCounts)):
-            if (self.hamWordCounts[i][1] < 5):
-                removalIndices.append(i)
-        for i in range(len(removalIndices) - 1, -1, -1):
-            del self.hamWordCounts[removalIndices[i]]
-        removalIndices = []
-        for i in range(len(self.spamWordCounts)):
-            if (self.spamWordCounts[i][1] < 5):
-                removalIndices.append(i)
-        for i in range(len(removalIndices) - 1, -1, -1):
-            del self.spamWordCounts[removalIndices[i]]
+    def trim_word_counts(self):
+        removal_indices = []
+        for i in range(len(self.ham_word_counts)):
+            if self.ham_word_counts[i][1] < 5:
+                removal_indices.append(i)
+        for i in range(len(removal_indices) - 1, -1, -1):
+            del self.ham_word_counts[removal_indices[i]]
+        removal_indices = []
+        for i in range(len(self.spam_word_counts)):
+            if self.spam_word_counts[i][1] < 5:
+                removal_indices.append(i)
+        for i in range(len(removal_indices) - 1, -1, -1):
+            del self.spam_word_counts[removal_indices[i]]
 
-    def balanceWordCounts(self):
-        totalSpamEmails = int(self.y.sum())
-        totalHamEmails = len(self.y) - totalSpamEmails
+    def balance_word_counts(self):
+        total_spam_emails = int(self.y.sum())
+        total_ham_emails = len(self.y) - total_spam_emails
         # how much to multiply each spamWordOccurence by
-        spamMultiplier = totalHamEmails / totalSpamEmails
+        spam_multiplier = total_ham_emails / total_spam_emails
 
-        for i in range(len(self.spamWordCounts)):
-            self.spamWordCounts[i] = (self.spamWordCounts[i][0], int(self.spamWordCounts[i][1] * spamMultiplier))
+        for i in range(len(self.spam_word_counts)):
+            self.spam_word_counts[i] = (self.spam_word_counts[i][0], int(self.spam_word_counts[i][1] * spam_multiplier))
 
-    def displayWordCounts(self):
-        totalSpamWords = len(self.spamWordCounts)
-        totalHamWords = len(self.hamWordCounts)
+    def display_word_counts(self):
+        total_spam_words = len(self.spam_word_counts)
+        total_ham_words = len(self.ham_word_counts)
 
-        for i in range(max(totalSpamWords, totalHamWords)):
+        for i in range(max(total_spam_words, total_ham_words)):
             s = '#' + str(i) + ': '
-            if (i < totalSpamWords):
-                s += "SPAM " + str(self.spamWordCounts[i]) + " "
-            if (i < totalHamWords):
-                s += "HAM " + str(self.hamWordCounts[i]) + " "
+            if i < total_spam_words:
+                s += "SPAM " + str(self.spam_word_counts[i]) + " "
+            if i < total_ham_words:
+                s += "HAM " + str(self.ham_word_counts[i]) + " "
             print(s)
 
-    def calcKeySpamWordsList(self):
-        self.countWordOccurences()
-        self.trimWordCounts()
-        self.balanceWordCounts()
+    def calc_key_spam_words_list(self):
+        self.count_word_occurences()
+        self.trim_word_counts()
+        self.balance_word_counts()
 
-        unsortedKeySpamWords = []
-        maxOccurenceRatio = 0
+        unsorted_key_spam_words = []
+        max_occurence_ratio = 0
 
         # for every spam word if it appears at least twice as much as a ham word then record it's occurence
-        # ratio and the word in the unsortedKeySpamWords list
-        for i in range(len(self.spamWordCounts)):
-            wordCount = self.spamWordCounts[i]
-            occurenceRatio = int(wordCount[1] / self.getWordOccurence(wordCount[0], False))
-            if occurenceRatio >= 2:
-                unsortedKeySpamWords.append((self.spamWordCounts[i][0], occurenceRatio))
-                maxOccurenceRatio = max(maxOccurenceRatio, occurenceRatio)
-            elif occurenceRatio < -1:
-                unsortedKeySpamWords.append((self.spamWordCounts[i][0], -1))
+        # ratio and the word in the unsorted_key_spam_words list
+        for i in range(len(self.spam_word_counts)):
+            word_count = self.spam_word_counts[i]
+            occurence_ratio = int(word_count[1] / self.get_word_occurence(word_count[0], False))
+            if occurence_ratio >= 2:
+                unsorted_key_spam_words.append((self.spam_word_counts[i][0], occurence_ratio))
+                max_occurence_ratio = max(max_occurence_ratio, occurence_ratio)
+            elif occurence_ratio < -1:
+                unsorted_key_spam_words.append((self.spam_word_counts[i][0], -1))
 
-        for i in range(maxOccurenceRatio + 1):
-            self.keySpamWordsList.append([])
+        for i in range(max_occurence_ratio + 1):
+            self.key_spam_words_list.append([])
 
-        for keySpamWord in unsortedKeySpamWords:
+        for keySpamWord in unsorted_key_spam_words:
             if keySpamWord[1] > 0:
-                self.keySpamWordsList[keySpamWord[1]].append(keySpamWord[0])
+                self.key_spam_words_list[keySpamWord[1]].append(keySpamWord[0])
             else:
-                self.keySpamWordsList[0].append(keySpamWord[0])
+                self.key_spam_words_list[0].append(keySpamWord[0])
 
-    def averageOccurenceRatio(self):
-        totalWords = 0
-        totalOccurenceRatios = 0
-        for occurenceRatio, words in enumerate(self.keySpamWordsList[2:]):
-            totalWords += len(words)
-            totalOccurenceRatios += len(words) * (occurenceRatio + 2)
-        return round(totalOccurenceRatios / totalWords)
+    def average_occurence_ratio(self) -> object:
+        total_words = 0
+        total_occurence_ratios = 0
+        for occurenceRatio, words in enumerate(self.key_spam_words_list[2:]):
+            total_words += len(words)
+            total_occurence_ratios += len(words) * (occurenceRatio + 2)
+        return round(total_occurence_ratios / total_words)
 
-    def calcKeySpamWordsDict(self):
-        if (len(self.keySpamWordsList) == 0):
-            self.calcKeySpamWordsList()
-        leastSignificantOccurenceRatio = 2
-        for occurenceRatio in range(leastSignificantOccurenceRatio, len(self.keySpamWordsList)):
-            for word in self.keySpamWordsList[occurenceRatio]:
-                self.keySpamWordsDict[word] = occurenceRatio
-        avgOccRatio = self.averageOccurenceRatio()
-        for word in self.keySpamWordsList[0]:
-            self.keySpamWordsDict[word] = avgOccRatio
+    def calc_key_spam_words_dict(self):
+        if len(self.key_spam_words_list) == 0:
+            self.calc_key_spam_words_list()
+        least_significant_occurence_ratio = 2
+        for occurenceRatio in range(least_significant_occurence_ratio, len(self.key_spam_words_list)):
+            for word in self.key_spam_words_list[occurenceRatio]:
+                self.key_spam_words_dict[word] = occurenceRatio
+        avg_occ_ratio = self.average_occurence_ratio()
+        for word in self.key_spam_words_list[0]:
+            self.key_spam_words_dict[word] = avg_occ_ratio
 
 
 class EmailQuantifier:
     orderedAttributes = ["SpamWordIndex", "CarbonCopies", "PriceOcc", "PercentOcc", "LinkOcc", "UnsecureLinkOcc",
                          "SecureLinkOcc", "SpecialCharOcc", "UppercaseWordOcc"]
 
-    def __init__(self, spamKeyWordsDict):
-        self._spamKeyWordsDict = spamKeyWordsDict
+    def __init__(self, spam_key_words_dict):
+        self._spam_key_words_dict = spam_key_words_dict
 
-    def quantifySingleEmail(self, email):
-        numRepresentation = []
-        numRepresentation.append(self.calcSpamWordIndex(email))
-        numRepresentation.append(self.countCarbonCopies(email))
-        numRepresentation.append(self.countPriceOccurences(email))
-        numRepresentation.append(self.countPercentageOccurences(email))
-        numRepresentation.append(self.countLinkOccurences(email))
-        numRepresentation.append(self.countUnsecureLinkOccurences(email))
-        numRepresentation.append(self.countSecureLinkOccurences(email))
-        numRepresentation.append(self.countSpecialCharactersOccurences(email))
-        numRepresentation.append(self.countUppercaseWordOccurences(email))
-        return numRepresentation
+    def quantify_single_email(self, email):
+        num_representation = [self.calc_spam_word_index(email), self.count_carbon_copies(email),
+                              self.count_price_occurences(email), self.count_percentage_occurences(email),
+                              self.count_link_occurences(email), self.count_unsecure_link_occurences(email),
+                              self.count_secure_link_occurences(email), self.count_special_characters_occurences(email),
+                              self.count_uppercase_word_occurences(email)]
+        return num_representation
 
     # Each row is for a single email
-    def quantifyBatchEmails(self, emails):
-        numRepresentations = []
+    def quantify_batch_emails(self, emails):
+        num_representations = []
         for email in emails:
-            numRepresentations.append(self.quantifySingleEmail(email))
-        return numRepresentations
+            num_representations.append(self.quantify_single_email(email))
+        return num_representations
 
-    def calcSpamWordIndex(self, email):
+    def calc_spam_word_index(self, email):
         wp = WordParser(email.unifyPayload())
         words = wp.words()
 
-        spamWordIndex = 0
+        spam_word_index = 0
         for word in words:
-            if word in self._spamKeyWordsDict:
-                spamWordIndex += self._spamKeyWordsDict[word]
-        spamWordIndex = int((spamWordIndex * 100) / len(words))
-        return spamWordIndex
+            if word in self._spam_key_words_dict:
+                spam_word_index += self._spam_key_words_dict[word]
+        spam_word_index = int((spam_word_index * 100) / len(words))
+        return spam_word_index
 
-    def countCarbonCopies(self, email):
-        if email.copies == None:
+    @staticmethod
+    def count_carbon_copies(email):
+        if email.copies is None:
             return 0
         total = 0
         total += email.copies.count(',')
@@ -328,26 +337,27 @@ class EmailQuantifier:
             total += 1
         return total
 
-    def countPriceOccurences(self, email):
-        return self._regexPayloadSearch('\$[0-9\.]+', email)
+    def count_price_occurences(self, email):
+        return self._regex_payload_search('\$[0-9\.]+', email)
 
-    def countPercentageOccurences(self, email):
-        return self._regexPayloadSearch('[0-9\.]+%', email)
+    def count_percentage_occurences(self, email):
+        return self._regex_payload_search('[0-9\.]+%', email)
 
-    def countLinkOccurences(self, email):
-        return self._regexPayloadSearch('[h][t][t][p]', email)
+    def count_link_occurences(self, email):
+        return self._regex_payload_search('[h][t][t][p]', email)
 
-    def countUnsecureLinkOccurences(self, email):
-        return self._regexPayloadSearch('[h][t][t][p][:]', email)
+    def count_unsecure_link_occurences(self, email):
+        return self._regex_payload_search('[h][t][t][p][:]', email)
 
-    def countSecureLinkOccurences(self, email):
-        return self._regexPayloadSearch('[h][t][t][p][s][:]', email)
+    def count_secure_link_occurences(self, email):
+        return self._regex_payload_search('[h][t][t][p][s][:]', email)
 
-    def countSpecialCharactersOccurences(self, email):
-        return self._regexPayloadSearch('[^a-zA-Z0-9\s]', email)
+    def count_special_characters_occurences(self, email):
+        return self._regex_payload_search('[^a-zA-Z0-9\s]', email)
 
-    def countUppercaseWordOccurences(self, email):
-        return self._regexPayloadSearch('[A-Z]{2,100}', email)
+    def count_uppercase_word_occurences(self, email):
+        return self._regex_payload_search('[A-Z]{2,100}', email)
 
-    def _regexPayloadSearch(self, regexStr, email):
+    @staticmethod
+    def _regex_payload_search(regexStr, email):
         return len(findall(regexStr, email.unifyPayload()))

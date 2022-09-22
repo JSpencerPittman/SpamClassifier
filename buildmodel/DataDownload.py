@@ -16,6 +16,8 @@ def download_corpus(dataset_dir: str = 'data'):
         '20030228_spam.tar.bz2': 'spam',
     }
 
+    directory = ""
+
     # ------ Create Directories ------ #
 
     # downloads will store all the actual data
